@@ -4,7 +4,7 @@ import Media from './Media';
 import * as THREE from 'three';
 import { lerp } from 'three/src/math/MathUtils';
 
-class App {
+export default class App {
   constructor() {
     this.speed = 2;
     this.scroll = {
@@ -198,5 +198,3 @@ class App {
     window.addEventListener('touchend', this.onTouchUp.bind(this));
   }
 }
-
-new App();

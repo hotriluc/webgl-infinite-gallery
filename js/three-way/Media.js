@@ -42,6 +42,7 @@ export default class {
 
     const material = new THREE.ShaderMaterial({
       uniforms: {
+        u_time: { value: 0 },
         u_map: { type: 't', value: null },
         u_plane_size: { value: new THREE.Vector2(0, 0) },
         u_image_size: { value: new THREE.Vector2(0, 0) },
@@ -97,6 +98,7 @@ export default class {
   }
 
   update(y, direction) {
+    this.plane.material.uniforms.u_time.value += 0.01;
     this.updateScale();
     this.updateX();
     this.updateY(y.current);

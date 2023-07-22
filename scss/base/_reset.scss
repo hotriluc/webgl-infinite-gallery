@@ -18,8 +18,13 @@ html {
 body {
   min-height: 100vh;
   line-height: 1.5;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  background-color: #101010;
+  background-color: black;
+  color: #fefefe;
+
+  overscroll-behavior-y: none;
+  overflow: hidden;
 }
 
 html,

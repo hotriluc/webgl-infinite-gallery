@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="loading">
 
 <head>
   <meta charset="UTF-8" />
@@ -10,8 +10,19 @@
 </head>
 
 <body>
-  <main>
+  <header class="header">
+    <h1 class="header__title">Infinite WebGL Scrolling Gallery <span>using ThreeJS with shaders</span></h1>
+    <nav class="navigation">
 
+      <ul class="header__links">
+        <a class="header__link"
+          href="https://tympanus.net/codrops/2021/01/05/creating-an-infinite-auto-scrolling-gallery-using-webgl-with-ogl-and-glsl-shaders/">Article</a>
+        <a class="header__link" href="#">Github</a>
+      </ul>
+
+    </nav>
+  </header>
+  <main>
     <div class="gallery">
       <figure class="gallery__figure">
         <img src="/1.jpeg" alt="" class="gallery__img">
@@ -55,7 +66,7 @@
     <canvas class="canvas"></canvas>
   </main>
 
-  <script type="module" src="/js/three-way/App.js"></script>
+  <script type="module" src="/js/index.js"></script>
 </body>
 
 </html>
