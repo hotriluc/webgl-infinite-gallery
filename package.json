@@ -23,6 +23,8 @@
     "@dogstudio/highway": "^2.2.1",
     "@studio-freight/lenis": "^1.0.16",
     "gsap": "^3.12.1",
-    "ogl": "^0.0.117"
+    "normalize-wheel": "^1.0.1",
+    "ogl-typescript": "^0.1.40",
+    "three": "^0.154.0"
   }
 }

@@ -1,18 +1,20 @@
-import '/scss/styles.scss';
-import Lenis from '@studio-freight/lenis';
+import App from './three-way/App';
 
-/**
- * Smooth scroll
- */
-const lenis = new Lenis();
+new App();
 
-lenis.on('scroll', (e) => {
-  console.log(e);
+const images = document.querySelectorAll('img');
+let imagesIndex = 0;
+
+Array.from(images).forEach((element) => {
+  const image = new Image();
+
+  image.src = element.src;
+  image.onload = () => {
+    imagesIndex += 1;
+
+    if (imagesIndex === images.length) {
+      document.documentElement.classList.remove('loading');
+      document.documentElement.classList.add('loaded');
+    }
+  };
 });
-
-function raf(time) {
-  lenis.raf(time);
-  requestAnimationFrame(raf);
-}
-
-requestAnimationFrame(raf);

@@ -1,0 +1,22 @@
+body {
+  &:after {
+    animation: grain 6s steps(10) infinite;
+    background-image: url('/grain.png');
+    background-repeat: repeat;
+    content: '';
+    height: 300%;
+    left: -100%;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: -100%;
+    transition: opacity 0.4s ease;
+    width: 300%;
+    will-change: transform;
+    z-index: 3;
+  }
+
+  .loaded &:after {
+    opacity: 0.06;
+  }
+}
