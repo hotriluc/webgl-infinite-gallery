@@ -1,21 +1,33 @@
-import Lenis from '@studio-freight/lenis';
+import normalizeWheel from 'normalize-wheel';
 import Media from './Media';
 
 import * as THREE from 'three';
+import { lerp } from 'three/src/math/MathUtils';
 
 class App {
   constructor() {
+    this.scroll = {
+      ease: 0.05,
+      current: 0,
+      target: 0,
+      last: 0,
+    };
+
+    this.speed = 2;
+
+    this.createTextureLoader();
     this.createRenderer();
     this.createCamera();
     this.createScene();
-    this.createSmoothScroller();
-    this.createTextureLoader();
+    this.createGallery();
+
     this.onResize();
 
-    this.createPlaneGeometry();
-    this.createdMedias();
+    this.createGeometry();
+    this.createMedias();
 
     this.update();
+
     this.addEventListeners();
   }
 
@@ -37,29 +49,27 @@ class App {
     this.scene = new THREE.Scene();
   }
 
-  createSmoothScroller() {
-    this.scroller = new Lenis();
-  }
-
   createTextureLoader() {
     this.tl = new THREE.TextureLoader();
   }
 
-  createPlaneGeometry() {
+  createGeometry() {
     this.planeGeometry = new THREE.PlaneGeometry();
   }
 
-  createdMedias() {
-    // Selecting from DOM
-    this.mediasElements = document.querySelectorAll('.gallery__figure');
+  createGallery() {
+    this.gallery = document.querySelector('.gallery');
+  }
 
-    // List of Medias
+  createMedias() {
+    this.mediasElements = document.querySelectorAll('.gallery__figure');
     this.medias = Array.from(this.mediasElements).map((element) => {
       let media = new Media({
         element,
         geometry: this.planeGeometry,
-        scene: this.scene,
         tl: this.tl,
+        height: this.galleryHeight,
+        scene: this.scene,
         screen: this.screen,
         viewport: this.viewport,
       });
@@ -71,7 +81,12 @@ class App {
   /**
    * Handlers
    */
-  onWheel() {}
+  onWheel(event) {
+    const normalized = normalizeWheel(event);
+    const speed = normalized.pixelY;
+
+    this.scroll.target += speed * 0.5;
+  }
 
   onResize() {
     this.screen = {
@@ -93,9 +108,17 @@ class App {
       width,
     };
 
+    this.galleryBounds = this.gallery.getBoundingClientRect();
+    this.galleryHeight =
+      (this.viewport.height * this.galleryBounds.height) / this.screen.height;
+
     if (this.medias) {
       this.medias.forEach((media) =>
-        media.onResize({ screen: this.screen, viewport: this.viewport })
+        media.onResize({
+          height: this.galleryHeight,
+          screen: this.screen,
+          viewport: this.viewport,
+        })
       );
     }
   }
@@ -103,15 +126,31 @@ class App {
   /**
    * Tick method
    */
-  update(time) {
-    this.scroller.raf(time);
-    window.requestAnimationFrame(this.update.bind(this));
+  update() {
+    this.scroll.current = lerp(
+      this.scroll.current,
+      this.scroll.target,
+      this.scroll.ease
+    );
 
-    if (this.medias) {
-      this.medias.forEach((media) => media.update());
+    if (this.scroll.current > this.scroll.last) {
+      this.direction = 'down';
+    } else if (this.scroll.current < this.scroll.last) {
+      this.direction = 'up';
     }
 
+    if (this.medias) {
+      this.medias.forEach((media) =>
+        media.update(this.scroll.current, this.direction)
+      );
+    }
+
+    // Updating last position
+    this.scroll.last = this.scroll.current;
+
     this.renderer.render(this.scene, this.camera);
+
+    window.requestAnimationFrame(this.update.bind(this));
   }
 
   /**

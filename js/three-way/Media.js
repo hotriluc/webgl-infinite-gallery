@@ -4,28 +4,30 @@ import mediaVertexShader from '../../shaders/sketch/vertex.glsl';
 import mediaFragmentShader from '../../shaders/sketch/fragment.glsl';
 
 export default class {
-  constructor({ element, geometry, scene, tl, screen, viewport }) {
+  constructor({ element, geometry, tl, height, scene, screen, viewport }) {
     this.element = element;
     this.image = this.element.querySelector('img');
 
+    this.extra = 0;
+    this.height = height;
     this.geometry = geometry;
-    this.scene = scene;
     this.tl = tl;
+    this.scene = scene;
     this.screen = screen;
     this.viewport = viewport;
 
     this.createMesh();
     this.createBounds();
+
     this.onResize();
   }
-
   createMesh() {
     const image = new Image();
 
     // Preloading image
     image.src = this.image.src;
     image.onload = () => {
-      material.uniforms.u_image_size.value = new THREE.Vector2(
+      material.uniforms.u_image_size.value.set(
         image.naturalWidth,
         image.naturalHeight
       );
@@ -57,7 +59,7 @@ export default class {
     this.updateX();
     this.updateY();
 
-    this.plane.material.uniforms.u_plane_size.value = new THREE.Vector2(
+    this.plane.material.uniforms.u_plane_size.value.set(
       this.plane.scale.x,
       this.plane.scale.y
     );
@@ -84,20 +86,45 @@ export default class {
     this.plane.position.y =
       this.viewport.height / 2 -
       this.plane.scale.y / 2 -
-      ((this.bounds.top - y) / this.screen.height) * this.viewport.height;
+      ((this.bounds.top - y) / this.screen.height) * this.viewport.height -
+      this.extra;
+
+    console.log('set');
   }
 
-  update(y) {
+  update(y, direction) {
     this.updateScale();
     this.updateX();
     this.updateY(y);
+
+    const planeOffset = this.plane.scale.y / 2;
+    const viewportOffset = this.viewport.height / 2;
+
+    this.isBefore = this.plane.position.y + planeOffset < -viewportOffset;
+    this.isAfter = this.plane.position.y - planeOffset > viewportOffset;
+
+    if (direction === 'up' && this.isBefore) {
+      this.extra -= this.height;
+
+      this.isBefore = false;
+      this.isAfter = false;
+    }
+
+    if (direction === 'down' && this.isAfter) {
+      this.extra += this.height;
+
+      this.isBefore = false;
+      this.isAfter = false;
+    }
   }
 
   // Update Bounds on window resize
   onResize(sizes) {
+    this.extra = 0;
     if (sizes) {
-      const { screen, viewport } = sizes;
+      const { height, screen, viewport } = sizes;
 
+      if (height) this.height = height;
       if (screen) this.screen = screen;
       if (viewport) this.viewport = viewport;
     }
