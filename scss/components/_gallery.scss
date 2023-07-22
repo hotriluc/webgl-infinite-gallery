@@ -98,3 +98,14 @@
     width: 100%;
   }
 }
+
+.title {
+  user-select: none;
+  pointer-events: none;
+  position: absolute;
+  font-size: 15rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+}
