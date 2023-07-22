@@ -6,6 +6,7 @@ import { lerp } from 'three/src/math/MathUtils';
 
 class App {
   constructor() {
+    this.speed = 2;
     this.scroll = {
       ease: 0.05,
       current: 0,
@@ -36,7 +37,7 @@ class App {
       canvas: document.querySelector('.canvas'),
       alpha: true,
     });
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
 
   createCamera() {
@@ -78,14 +79,38 @@ class App {
     });
   }
 
-  /**
-   * Handlers
-   */
+  // Wheel Events
   onWheel(event) {
     const normalized = normalizeWheel(event);
     const speed = normalized.pixelY;
 
     this.scroll.target += speed * 0.5;
+  }
+
+  // Touch events
+  onTouchDown(event) {
+    // Mouse Button / Finger is down
+    this.isDown = true;
+
+    // Save current position
+    this.scroll.position = this.scroll.current;
+    this.start = event.touches ? event.touches[0].clientY : event.clientY;
+  }
+
+  onTouchMove(event) {
+    if (!this.isDown) return;
+
+    // Calculate drag offset along Y
+    const y = event.touches ? event.touches[0].clientY : event.clientY;
+    const distance = (this.start - y) * 2;
+
+    // Set scroll new target
+    this.scroll.target = this.scroll.position + distance;
+  }
+
+  onTouchUp() {
+    // Mouse Button / Finger is up => no more execution
+    this.isDown = false;
   }
 
   onResize() {
@@ -127,6 +152,9 @@ class App {
    * Tick method
    */
   update() {
+    // auto scrolling
+    this.scroll.target += this.speed;
+
     this.scroll.current = lerp(
       this.scroll.current,
       this.scroll.target,
@@ -134,9 +162,11 @@ class App {
     );
 
     if (this.scroll.current > this.scroll.last) {
+      this.speed = 2;
       this.direction = 'down';
     } else if (this.scroll.current < this.scroll.last) {
       this.direction = 'up';
+      this.speed = -2;
     }
 
     if (this.medias) {
@@ -160,6 +190,14 @@ class App {
     window.addEventListener('resize', this.onResize.bind(this));
     window.addEventListener('mousewheel', this.onWheel.bind(this));
     window.addEventListener('wheel', this.onWheel.bind(this));
+
+    window.addEventListener('mousedown', this.onTouchDown.bind(this));
+    window.addEventListener('mousemove', this.onTouchMove.bind(this));
+    window.addEventListener('mouseup', this.onTouchUp.bind(this));
+
+    window.addEventListener('touchstart', this.onTouchDown.bind(this));
+    window.addEventListener('touchmove', this.onTouchMove.bind(this));
+    window.addEventListener('touchend', this.onTouchUp.bind(this));
   }
 }
 

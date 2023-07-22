@@ -16,9 +16,11 @@ export default class {
     this.screen = screen;
     this.viewport = viewport;
 
+    // Creating mesh
     this.createMesh();
+    // Calculating Mesh Bounds according to DOM element
     this.createBounds();
-
+    // Updating screen and viewport fields
     this.onResize();
   }
   createMesh() {
@@ -88,8 +90,6 @@ export default class {
       this.plane.scale.y / 2 -
       ((this.bounds.top - y) / this.screen.height) * this.viewport.height -
       this.extra;
-
-    console.log('set');
   }
 
   update(y, direction) {
@@ -100,7 +100,18 @@ export default class {
     const planeOffset = this.plane.scale.y / 2;
     const viewportOffset = this.viewport.height / 2;
 
+    // if the new plane offset is lower than negative viewport offset
+    // that means the plane is at the bottom and not in the viewport
+    // so we have to place it at the beginning
+    // we add planeOffset because we want to do things
+    // only if the top half is out of view (bottom half is already out of view)
     this.isBefore = this.plane.position.y + planeOffset < -viewportOffset;
+
+    // if the new plane offset is higher than viewport offset
+    // that means the plane is on top and not in the viewport
+    // so we have to place it at the bottom (after gallery end)
+    // we extract planeOffset because we want to do things
+    // only if the bottom half is out of view (top half is already out of view)
     this.isAfter = this.plane.position.y - planeOffset > viewportOffset;
 
     if (direction === 'up' && this.isBefore) {
