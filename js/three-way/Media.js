@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-import mediaVertexShader from '../shaders/sketch/vertex.glsl';
-import mediaFragmentShader from '../shaders/sketch/fragment.glsl';
+import mediaVertexShader from '../../shaders/sketch/vertex.glsl';
+import mediaFragmentShader from '../../shaders/sketch/fragment.glsl';
 
 export default class {
   constructor({ element, geometry, scene, tl, screen, viewport }) {
