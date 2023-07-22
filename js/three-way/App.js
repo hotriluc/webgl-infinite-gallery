@@ -170,9 +170,7 @@ class App {
     }
 
     if (this.medias) {
-      this.medias.forEach((media) =>
-        media.update(this.scroll.current, this.direction)
-      );
+      this.medias.forEach((media) => media.update(this.scroll, this.direction));
     }
 
     // Updating last position

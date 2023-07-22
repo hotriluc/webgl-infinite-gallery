@@ -45,6 +45,10 @@ export default class {
         u_map: { type: 't', value: null },
         u_plane_size: { value: new THREE.Vector2(0, 0) },
         u_image_size: { value: new THREE.Vector2(0, 0) },
+        u_viewport_size: {
+          value: new THREE.Vector2(this.viewport.width, this.viewport.height),
+        },
+        u_strength: { value: 0 },
       },
       vertexShader: mediaVertexShader,
       fragmentShader: mediaFragmentShader,
@@ -95,7 +99,11 @@ export default class {
   update(y, direction) {
     this.updateScale();
     this.updateX();
-    this.updateY(y);
+    this.updateY(y.current);
+
+    // Get delta between scroll current and last
+    this.plane.material.uniforms.u_strength.value =
+      ((y.current - y.last) / this.screen.width) * 15;
 
     const planeOffset = this.plane.scale.y / 2;
     const viewportOffset = this.viewport.height / 2;
@@ -137,7 +145,14 @@ export default class {
 
       if (height) this.height = height;
       if (screen) this.screen = screen;
-      if (viewport) this.viewport = viewport;
+      if (viewport) {
+        this.viewport = viewport;
+
+        this.plane.material.uniforms.u_viewport_size.value = [
+          this.viewport.width,
+          this.viewport.height,
+        ];
+      }
     }
 
     this.createBounds();
